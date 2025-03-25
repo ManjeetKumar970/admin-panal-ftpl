@@ -1,8 +1,5 @@
-"use client";
-import React, { useState } from "react";
-import Banner from "../banner/Banner";
-import ProductCard from "../productcard/ProductCard";
-import ProductCategories from "../productCategories/ProductCategories";
+'use client';
+import React, { useState } from 'react';
 
 const Sidebar = () => {
   const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -26,7 +23,7 @@ const Sidebar = () => {
       {/* Sidebar */}
       <div
         className={`bg-purple-600 w-64 h-screen p-4 text-white shadow-md transition-all ${
-          sidebarVisible ? "block" : "hidden"
+          sidebarVisible ? 'block' : 'hidden'
         }`}
       >
         {/* Logo and Title */}
@@ -40,7 +37,7 @@ const Sidebar = () => {
             <li className="flex justify-between items-center">
               <div
                 className="flex items-center space-x-2 cursor-pointer hover:text-gray-200"
-                onClick={() => handleMenuClick("Dashboard")}
+                onClick={() => handleMenuClick('Dashboard')}
               >
                 <svg
                   className="w-6 h-6"
@@ -58,13 +55,15 @@ const Sidebar = () => {
                 </svg>
                 <span>Dashboard</span>
               </div>
-              <span className="bg-blue-600 text-white rounded-full px-2 text-xs">5</span>
+              <span className="bg-blue-600 text-white rounded-full px-2 text-xs">
+                5
+              </span>
             </li>
 
             <li className="flex justify-between items-center">
               <div
                 className="flex items-center space-x-2 cursor-pointer hover:text-gray-200"
-                onClick={() => handleMenuClick("Product_Category")}
+                onClick={() => handleMenuClick('Product_Category')}
               >
                 <svg
                   className="w-6 h-6"
@@ -87,7 +86,7 @@ const Sidebar = () => {
             <li className="flex justify-between items-center">
               <div
                 className="flex items-center space-x-2 cursor-pointer hover:text-gray-200"
-                onClick={() => handleMenuClick("Projects")}
+                onClick={() => handleMenuClick('Projects')}
               >
                 <svg
                   className="w-6 h-6"
@@ -105,13 +104,15 @@ const Sidebar = () => {
                 </svg>
                 <span>Add Products</span>
               </div>
-              <span className="bg-blue-600 text-white rounded-full px-2 text-xs">12</span>
+              <span className="bg-blue-600 text-white rounded-full px-2 text-xs">
+                12
+              </span>
             </li>
 
             <li className="flex justify-between items-center">
               <div
                 className="flex items-center space-x-2 cursor-pointer hover:text-gray-200"
-                onClick={() => handleMenuClick("Calendar")}
+                onClick={() => handleMenuClick('Calendar')}
               >
                 <svg
                   className="w-6 h-6"
@@ -129,13 +130,15 @@ const Sidebar = () => {
                 </svg>
                 <span>Calendar</span>
               </div>
-              <span className="bg-blue-600 text-white rounded-full px-2 text-xs">20+</span>
+              <span className="bg-blue-600 text-white rounded-full px-2 text-xs">
+                20+
+              </span>
             </li>
 
             <li className="flex justify-between items-center">
               <div
                 className="flex items-center space-x-2 cursor-pointer hover:text-gray-200"
-                onClick={() => handleMenuClick("Documents")}
+                onClick={() => handleMenuClick('Documents')}
               >
                 <svg
                   className="w-6 h-6"
@@ -158,7 +161,7 @@ const Sidebar = () => {
             <li className="flex justify-between items-center">
               <div
                 className="flex items-center space-x-2 cursor-pointer hover:text-gray-200"
-                onClick={() => handleMenuClick("Reports")}
+                onClick={() => handleMenuClick('Reports')}
               >
                 <svg
                   className="w-6 h-6"
@@ -190,7 +193,7 @@ const Sidebar = () => {
             />
             <span>John Doe</span>
             <svg
-              className={`w-5 h-5 transform transition-transform ${userDetailsVisible ? "rotate-180" : ""}`}
+              className={`w-5 h-5 transform transition-transform ${userDetailsVisible ? 'rotate-180' : ''}`}
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               stroke="currentColor"
@@ -240,13 +243,19 @@ const Sidebar = () => {
       <div className="flex-1 bg-gray-100 p-8">
         <div className="content">
           {/* Conditionally render the content based on the selected menu */}
-          {selectedMenu === "Dashboard" && <div className="container bg-white"><Banner></Banner></div>}
-          {selectedMenu === "Product_Category" && <div className="container"><ProductCategories></ProductCategories></div>}
-          {selectedMenu === "Banner Updates" && <div className="container"><ProductCard></ProductCard></div>}
+          {selectedMenu === 'Dashboard' && (
+            <div className="container bg-white"></div>
+          )}
+          {selectedMenu === 'Product_Category' && (
+            <div className="container"></div>
+          )}
+          {selectedMenu === 'Banner Updates' && (
+            <div className="container"></div>
+          )}
 
-          {selectedMenu === "Calendar" && <div>Calendar Content</div>}
-          {selectedMenu === "Documents" && <div>Documents Content</div>}
-          {selectedMenu === "Reports" && <div>Reports Content</div>}
+          {selectedMenu === 'Calendar' && <div>Calendar Content</div>}
+          {selectedMenu === 'Documents' && <div>Documents Content</div>}
+          {selectedMenu === 'Reports' && <div>Reports Content</div>}
         </div>
       </div>
     </div>

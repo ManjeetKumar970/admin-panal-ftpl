@@ -1,12 +1,16 @@
-import Home from '@/page/home/Home'
-import React from 'react'
+'use client';
+import React from 'react';
+import Login from '@/page/login/Login';
+import AuthGuard from '@/components/Auth/AuthGuard';
 
-const page = () => {
+const Page = () => {
   return (
-   <>
-     <Home/>
-   </>
-  )
-}
+    <>
+      <AuthGuard>
+        <Login />
+      </AuthGuard>
+    </>
+  );
+};
 
-export default page
+export default Page;
