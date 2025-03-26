@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import mainLogo from '../../assets/main_logo.png';
-import { Home, Inbox, Settings, Menu } from 'lucide-react';
+import { LayoutDashboard, Building, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   SidebarContent,
@@ -15,12 +15,25 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 const items = [
-  { title: 'Dashboard', url: '/dashboard', icon: Home },
-  { title: 'Banner', url: '/banner', icon: Inbox },
-  { title: 'Settings', url: '#', icon: Settings }
+  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
+  { title: 'Interface', url: 'interface/banner', icon: Building }
 ];
 
-const SidebarItem = ({ item, activeTab, handleNavigation }: any) => (
+interface SidebarItemProps {
+  title: string;
+  url: string;
+  icon: React.ElementType;
+}
+
+const SidebarItem = ({
+  item,
+  activeTab,
+  handleNavigation
+}: {
+  item: SidebarItemProps;
+  activeTab: string;
+  handleNavigation: (url: string, title: string) => void;
+}) => (
   <SidebarMenuItem>
     <SidebarMenuButton asChild>
       <motion.div
@@ -47,7 +60,12 @@ export function AppSidebar({
   setIsOpen,
   activeTab,
   setActiveTab
-}: any) {
+}: {
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  activeTab: string;
+  setActiveTab: React.Dispatch<React.SetStateAction<string>>;
+}) {
   const router = useRouter();
   const showRef = useRef<HTMLDivElement | null>(null);
 
@@ -74,7 +92,7 @@ export function AppSidebar({
     <div className="relative">
       {/* Sidebar Header */}
       <div className="fixed top-0 left-0 w-full bg-[#161b22] text-white shadow-md px-6 py-4 flex items-center justify-between z-50">
-        <Image src={mainLogo} alt="Logo" width={120} height={50} />
+        <Image src={mainLogo} alt="Logo" width={100} />
       </div>
 
       {/* Sidebar */}
@@ -114,7 +132,7 @@ export function AppSidebar({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -100, opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="fixed left-0 top-14 w-16 h-screen bg-[#1c1f26] text-white shadow-xl border-r border-[#2d333b] flex flex-col items-center py-6"
+            className="fixed left-0 top-10 w-16 h-screen bg-[#1c1f26] text-white shadow-xl border-r border-[#2d333b] flex flex-col items-center py-6"
           >
             {items.map((item) => (
               <motion.button
@@ -129,7 +147,7 @@ export function AppSidebar({
                 }`}
                 aria-label={item.title}
               >
-                <item.icon className="w-6 h-6" />
+                <item.icon className="w-5 h-5" />
               </motion.button>
             ))}
 
@@ -141,7 +159,7 @@ export function AppSidebar({
                 onClick={() => setIsOpen(true)}
                 className="bg-[#2c313a] text-white p-3 rounded-full shadow-md hover:bg-[#383848] transition"
               >
-                <Menu className="w-6 h-6" />
+                <Menu className="w-5 h-5" />
               </motion.button>
             </div>
           </motion.div>

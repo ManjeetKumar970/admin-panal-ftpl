@@ -30,7 +30,7 @@ export default function ClientLayout({
             {/* Main Content */}
             <main
               className={`transition-all duration-300 ${
-                isOpen ? 'ml-72 mt-16' : 'ml-16 mt-16'
+                isOpen ? 'ml-72 mt-14' : 'ml-16 mt-14'
               } w-full`}
             >
               {children}
