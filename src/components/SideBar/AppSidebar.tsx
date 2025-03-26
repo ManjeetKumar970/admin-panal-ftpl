@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation';
 
 const items = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Interface', url: 'interface/banner', icon: Building }
+  { title: 'Interface', url: '/interface', icon: Building }
 ];
 
 interface SidebarItemProps {
