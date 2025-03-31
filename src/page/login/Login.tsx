@@ -42,7 +42,7 @@ const Login = () => {
 
   const loginMutation = useMutation({
     mutationFn: loginService,
-    onSuccess: (response: any) => {
+    onSuccess: (response) => {
       if (response?.status === 'success') {
         Cookies.set('access_token', response?.data?.access_token, {
           expires: 30

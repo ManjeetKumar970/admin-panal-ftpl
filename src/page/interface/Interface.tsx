@@ -14,17 +14,20 @@ const Card = ({
 }) => {
   return (
     <div
-      className="w-64 bg-white shadow-md p-9 space-y-3 relative overflow-hidden 
-                 transition-transform transform hover:scale-105 hover:shadow-xl 
-                 hover:bg-violet-100 duration-300 m-5 cursor-pointer rounded-xl"
+      className="w-72 bg-white shadow-lg p-8 space-y-4 relative overflow-hidden 
+                 transition-all transform hover:scale-105 hover:shadow-2xl 
+                 hover:bg-gradient-to-br from-violet-100 to-violet-200 duration-300 
+                 cursor-pointer rounded-2xl flex flex-col items-center justify-center"
       role="button"
       aria-label={title}
       onClick={clickFn}
     >
-      <div className="w-12 h-12 flex items-center justify-center bg-violet-500 text-white rounded-full">
-        <Icon size={24} />
+      <div className="w-16 h-16 flex items-center justify-center bg-violet-500 text-white rounded-full shadow-md">
+        <Icon size={28} />
       </div>
-      <h1 className="font-bold text-xl">{title}</h1>
+      <h1 className="font-semibold text-lg text-gray-800 text-center">
+        {title}
+      </h1>
     </div>
   );
 };
@@ -37,22 +40,20 @@ const Interface = () => {
   ];
 
   return (
-    <>
-      <section className="text-gray-600 body-font">
-        <div className="container px-5 py-5 mx-auto">
-          <div className="flex flex-wrap justify-center">
-            {cardData.map((card) => (
-              <Card
-                key={card.id}
-                title={card.title}
-                Icon={card.icon}
-                clickFn={() => router.push(card.link)}
-              />
-            ))}
-          </div>
+    <section className="text-gray-700 body-font">
+      <div className="container px-6 py-10 mx-auto">
+        <div className="flex flex-wrap justify-center gap-6">
+          {cardData.map((card) => (
+            <Card
+              key={card.id}
+              title={card.title}
+              Icon={card.icon}
+              clickFn={() => router.push(card.link)}
+            />
+          ))}
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 
