@@ -4,6 +4,7 @@ import axios, {
   AxiosError,
   InternalAxiosRequestConfig
 } from 'axios';
+import Cookies from 'js-cookie';
 
 const API_BASE_URL = 'https://backend-ftpl.onrender.com/api/v1';
 // const API_BASE_URL = 'http://localhost:3000/api/v1';
@@ -15,7 +16,7 @@ const interceptorInstance = axios.create({
 // Request interceptor for adding the bearer token
 interceptorInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    const token = localStorage.getItem('access_token');
+    const token = Cookies.get('access_token');
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -40,7 +41,6 @@ interceptorInstance.interceptors.response.use(
       console.error('Network error:', error.message);
       return Promise.reject(error);
     }
-
     return Promise.reject(error);
   }
 );

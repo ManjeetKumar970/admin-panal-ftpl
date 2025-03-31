@@ -86,7 +86,7 @@ export function AppSidebar({
     };
     document.addEventListener('mousedown', handlerClickOutside);
     return () => document.removeEventListener('mousedown', handlerClickOutside);
-  }, [isOpen]);
+  }, [isOpen, setIsOpen]);
 
   return (
     <div className="relative">

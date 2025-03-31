@@ -1,17 +1,17 @@
 import interceptorInstance from '@/middleware/Interceptors';
 
-export const createBanner = async (formData: any) => {
+export const createBanner = async (formData) => {
   const response = await interceptorInstance.get('/banner', formData);
   return response?.data;
 };
 
-export const updateBanner = async (id: string, formData: any) => {
+export const updateBanner = async (id: string, formData) => {
   const response = await interceptorInstance.get(`/banner/${id}`, formData);
   return response?.data;
 };
 
 export const getAllBanner = async () => {
-  const response = await interceptorInstance.get('/banner');
+  const response = await interceptorInstance.get('/banner?status=true');
   return response?.data;
 };
 
