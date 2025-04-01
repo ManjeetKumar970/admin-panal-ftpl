@@ -6,6 +6,7 @@ import { deleteBanner, getAllBanner } from './services';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { BannerList } from './types/Types';
+import { showGlobalAlert } from '@/components/Alert/Alert';
 
 export const useBanners = () => {
   return useQuery({
@@ -32,9 +33,13 @@ const Banner = () => {
   });
 
   const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this banner?')) {
-      deleteMutation.mutate(id);
-    }
+    showGlobalAlert(
+      'Confirm Delete',
+      'Are you sure you want to delete this item?',
+      () => {
+        deleteMutation.mutate(id);
+      }
+    );
   };
 
   useEffect(() => {

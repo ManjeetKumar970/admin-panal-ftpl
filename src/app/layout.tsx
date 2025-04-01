@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import QueryProvider from '@/providers/QueryProvider';
 import ClientLayout from './ClientLayout';
+import { Alert } from '@/components/Alert/Alert';
 
 export const metadata: Metadata = {
   title: process.env.APP_NAME
@@ -18,7 +19,10 @@ export default function RootLayout({
       <body>
         <QueryProvider>
           <Toaster position="top-center" reverseOrder={false} />
-          <ClientLayout>{children}</ClientLayout>
+          <ClientLayout>
+            <Alert />
+            {children}
+          </ClientLayout>
         </QueryProvider>
       </body>
     </html>
