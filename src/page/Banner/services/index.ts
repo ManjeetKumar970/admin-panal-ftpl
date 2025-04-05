@@ -33,6 +33,16 @@ export const getAllBanner = async () => {
 };
 
 /**
+ * Retrieves all banners with status=true.
+ * Typically used to fetch banners that are active/visible.
+ * @returns A list of active banners from the server.
+ */
+export const getBannerById = async (id: string | null) => {
+  const response = await interceptorInstance.get(`/banner/${id}`);
+  return response?.data;
+};
+
+/**
  * Deletes a banner by its ID.
  * @param id - The unique identifier of the banner to delete.
  * @returns The response data from the server after deletion.

@@ -1,6 +1,6 @@
 'use client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { PlusCircleIcon, Trash2Icon } from 'lucide-react';
+import { PlusCircleIcon, Trash2Icon, Pencil } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { deleteBanner, getAllBanner } from './services';
 import toast from 'react-hot-toast';
@@ -20,15 +20,22 @@ export const useBanners = () => {
 
 const Banner = () => {
   const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showBannerForm, setShowBannerForm] = useState<boolean>(false);
-  const { data: bannerData, error, isLoading, refetch } = useBanners();
+  const [selectEditId, setSelectEditId] = useState<string | null>(null);
+  const {
+    data: bannerData,
+    error,
+    isLoading: BannerIsLoading,
+    refetch
+  } = useBanners();
 
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: deleteBanner,
-    onSuccess: async () => {
+    onSuccess: async (response) => {
       await refetch();
-      toast.success('Banner deleted successfully');
+      toast.success(response?.message);
       queryClient.invalidateQueries({ queryKey: ['getAllBanner'] });
     },
     onError: (error) => {
@@ -41,7 +48,9 @@ const Banner = () => {
       'Confirm Delete',
       'Are you sure you want to delete this item?',
       () => {
+        setIsLoading(true);
         deleteMutation.mutate(id);
+        setIsLoading(false);
       }
     );
   };
@@ -69,14 +78,14 @@ const Banner = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 mt-10">
-          {isLoading
+          {isLoading || BannerIsLoading || deleteMutation.isPending
             ? Array.from({ length: 6 }).map((_, index) => (
                 <Skeleton height={300} width={350} key={index} />
               ))
             : bannerData?.data?.banners?.map((item: BannerList) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition duration-300"
+                  className="bg-white cursor-pointer rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition duration-300"
                 >
                   <div className="relative h-72 w-96">
                     <Image
@@ -87,16 +96,25 @@ const Banner = () => {
                       height={100}
                     />
                   </div>
-                  <div className="p-6 flex justify-between items-center">
-                    <h2 className="text-xl font-semibold text-gray-900">
+                  <div className="flex items-center justify-between px-5 py-4">
+                    <h2 className="text-lg font-semibold text-gray-800 truncate">
                       {item.name}
                     </h2>
-                    <Trash2Icon
-                      onClick={() => handleDelete(item.id)}
-                      className="cursor-pointer text-red-500"
-                      size={18}
-                      strokeWidth={2}
-                    />
+                    <div className="flex items-center gap-3">
+                      <Pencil
+                        onClick={() => {
+                          setSelectEditId(item?.id);
+                          setShowBannerForm(true);
+                        }}
+                        className="cursor-pointer text-indigo-500 hover:text-indigo-700 transition"
+                        size={18}
+                      />
+                      <Trash2Icon
+                        onClick={() => handleDelete(item.id)}
+                        className="cursor-pointer text-red-500 hover:text-red-700 transition"
+                        size={18}
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
@@ -106,12 +124,19 @@ const Banner = () => {
         height={700}
         width={800}
         isOpen={showBannerForm}
-        title={'Banner Form'}
-        onClose={() => setShowBannerForm(false)}
+        title={selectEditId ? 'Update Banner' : 'Create Banner'}
+        onClose={() => {
+          setShowBannerForm(false);
+          setSelectEditId(null);
+        }}
       >
         <BannerForm
-          RefreshFn={refetch}
-          CloseFn={() => setShowBannerForm(false)}
+          refreshFn={refetch}
+          recordId={selectEditId}
+          closeFn={() => {
+            setShowBannerForm(false);
+            setSelectEditId(null);
+          }}
         />
       </Modal>
     </section>
