@@ -2,9 +2,10 @@ import interceptorInstance from '@/middleware/Interceptors';
 import { BannerFormTypes } from '../types/Types';
 
 /**
- * Creates a new banner.
- * @param formData - The data required to create a banner (title, image, etc.).
- * @returns The response data from the server after banner creation.
+ * Sends a POST request to create a new banner.
+ *
+ * @param formData - An object containing banner data (e.g., title, image, status).
+ * @returns The server's response data after successfully creating the banner.
  */
 export const createBanner = async (formData: BannerFormTypes) => {
   const response = await interceptorInstance.post('/banner', formData);
@@ -12,10 +13,11 @@ export const createBanner = async (formData: BannerFormTypes) => {
 };
 
 /**
- * Updates an existing banner by ID.
+ * Sends a PATCH request to update an existing banner by its ID.
+ *
  * @param id - The unique identifier of the banner to update.
- * @param formData - The updated data for the banner.
- * @returns The response data from the server after banner update.
+ * @param formData - An object containing the updated banner data.
+ * @returns The server's response data after successfully updating the banner.
  */
 export const updateBanner = async (id: string, formData: BannerFormTypes) => {
   const response = await interceptorInstance.patch(`/banner/${id}`, formData);
@@ -23,9 +25,9 @@ export const updateBanner = async (id: string, formData: BannerFormTypes) => {
 };
 
 /**
- * Retrieves all banners with status=true.
- * Typically used to fetch banners that are active/visible.
- * @returns A list of active banners from the server.
+ * Retrieves all banners with `status=true`, indicating active banners.
+ *
+ * @returns A list of all active (visible) banners from the server.
  */
 export const getAllBanner = async () => {
   const response = await interceptorInstance.get('/banner?status=true');
@@ -33,9 +35,21 @@ export const getAllBanner = async () => {
 };
 
 /**
- * Deletes a banner by its ID.
+ * Retrieves a single banner by its ID.
+ *
+ * @param id - The unique identifier of the banner to retrieve.
+ * @returns The server's response data containing the banner details.
+ */
+export const getBannerById = async (id: string | null) => {
+  const response = await interceptorInstance.get(`/banner/${id}`);
+  return response?.data;
+};
+
+/**
+ * Sends a DELETE request to remove a banner by its ID.
+ *
  * @param id - The unique identifier of the banner to delete.
- * @returns The response data from the server after deletion.
+ * @returns The server's response data after the banner has been deleted.
  */
 export const deleteBanner = async (id: string) => {
   const response = await interceptorInstance.delete(`/banner/${id}`);

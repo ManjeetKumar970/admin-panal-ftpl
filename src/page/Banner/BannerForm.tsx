@@ -1,17 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BannerFormTypes } from './types/Types';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { singleFileUpload } from '@/services/FileUpload';
-import { createBanner } from './services';
+import { createBanner, getBannerById, updateBanner } from './services';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 const BannerForm = ({
-  CloseFn,
-  RefreshFn
+  closeFn,
+  refreshFn,
+  recordId
 }: {
-  CloseFn: () => void;
-  RefreshFn: () => void;
+  closeFn: () => void;
+  refreshFn: () => void;
+  recordId: string | null;
 }) => {
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState<BannerFormTypes>({
     name: '',
     file_id: '',
@@ -19,14 +24,43 @@ const BannerForm = ({
     sub_description: '',
     btn_link: ''
   });
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const { data: bannerData } = useQuery({
+    queryKey: ['getBannerById', recordId],
+    queryFn: () => getBannerById(recordId),
+    enabled: !!recordId,
+    staleTime: 0
+  });
 
   const { mutate: bannerCreateServices, isPending: isBannerLoading } =
     useMutation({
       mutationFn: createBanner,
       onSuccess: (response) => {
-        CloseFn();
-        RefreshFn();
+        queryClient.invalidateQueries({
+          queryKey: ['getBannerById', recordId]
+        });
+        closeFn();
+        refreshFn();
+        toast.success(response?.message);
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data?.message);
+      }
+    });
+
+  const { mutate: bannerUpdateServices, isPending: isUpdateBannerLoading } =
+    useMutation({
+      mutationFn: (formData: BannerFormTypes) =>
+        updateBanner(recordId as string, formData),
+      onSuccess: (response) => {
+        queryClient.invalidateQueries({
+          queryKey: ['getBannerById', recordId]
+        });
+        closeFn();
+        refreshFn();
         toast.success(response?.message);
       },
       onError: (error) => {
@@ -39,8 +73,11 @@ const BannerForm = ({
       mutationFn: singleFileUpload,
       onSuccess: async (response) => {
         formData.file_id = response?.data?.uploaded_file[0]?.public_id;
-        debugger;
-        await bannerCreateServices(formData);
+        if (!recordId) {
+          await bannerCreateServices(formData);
+        } else {
+          await bannerUpdateServices(formData);
+        }
       },
       onError: (error) => {
         toast.error(error?.response?.data?.message);
@@ -51,128 +88,170 @@ const BannerForm = ({
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      // Simulate getting file_id (e.g. after upload)
-      setFormData({ ...formData, file_id: file.name });
+      const preview = URL.createObjectURL(file);
+      setPreviewUrl(preview);
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    uploadSingleFile(selectedFile);
-    console.log(formData);
+    if (!recordId) {
+      uploadSingleFile(selectedFile);
+    } else {
+      debugger;
+      if (selectedFile) {
+        uploadSingleFile(selectedFile);
+      } else {
+        formData.file_id = bannerData?.data?.file_info?.file_id;
+        bannerUpdateServices(formData);
+      }
+    }
   };
 
+  useEffect(() => {
+    if (bannerData?.data) {
+      setFormData({
+        name: bannerData.data.name,
+        file_id: '',
+        head_description: bannerData.data.head_description,
+        sub_description: bannerData.data.sub_description,
+        btn_link: bannerData.data.btn_link
+      });
+
+      setPreviewUrl(bannerData.data.file_info?.file_url || null);
+    }
+  }, [bannerData]);
+
   return (
-    <>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-gray-700 font-medium mb-1">
-            Banner Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="name"
-            id="name"
-            value={formData.name}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                [e.target.id]: e.target.value
-              }))
-            }
-            placeholder="Enter banner name"
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-            required
-          />
-        </div>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Banner Name */}
+      <div>
+        <label className="block text-gray-700 font-medium mb-1">
+          Banner Name <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="name"
+          value={formData.name}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }))
+          }
+          placeholder="Enter banner name"
+          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+          required
+        />
+      </div>
 
-        <div>
-          <label className="block text-gray-700 font-medium mb-1">
-            Head Description <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            name="head_description"
-            id="head_description"
-            value={formData.head_description}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                [e.target.id]: e.target.value
-              }))
-            }
-            placeholder="Enter head description"
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-            rows={3}
-            required
-          />
-        </div>
+      {/* Head Description */}
+      <div>
+        <label className="block text-gray-700 font-medium mb-1">
+          Head Description <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          id="head_description"
+          value={formData.head_description}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }))
+          }
+          rows={3}
+          placeholder="Enter head description"
+          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+          required
+        />
+      </div>
 
-        <div>
-          <label className="block text-gray-700 font-medium mb-1">
-            Sub Description <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            name="sub_description"
-            id="sub_description"
-            value={formData.sub_description}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                [e.target.id]: e.target.value
-              }))
-            }
-            placeholder="Enter sub description"
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-            rows={3}
-            required
-          />
-        </div>
+      {/* Sub Description */}
+      <div>
+        <label className="block text-gray-700 font-medium mb-1">
+          Sub Description <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          id="sub_description"
+          value={formData.sub_description}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }))
+          }
+          rows={3}
+          placeholder="Enter sub description"
+          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+          required
+        />
+      </div>
 
-        <div>
-          <label className="block text-gray-700 font-medium mb-1">
-            Button Link <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="url"
-            name="btn_link"
-            id="btn_link"
-            value={formData.btn_link}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                [e.target.id]: e.target.value
-              }))
-            }
-            placeholder="Enter button link"
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-            required
-          />
-        </div>
+      {/* Button Link */}
+      <div>
+        <label className="block text-gray-700 font-medium mb-1">
+          Button Link <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="url"
+          id="btn_link"
+          value={formData.btn_link}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }))
+          }
+          placeholder="Enter button link"
+          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+          required
+        />
+      </div>
 
-        {/* File Upload */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-1">
-            Upload File <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="w-full cursor-pointer p-2 border rounded-lg  file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
-            required
-          />
+      {/* Image Preview (both new upload and existing) */}
+      {previewUrl && (
+        <div className="mb-4">
+          <p className="text-sm font-medium text-gray-600 mb-2">
+            Image Preview:
+          </p>
+          <div className="border rounded-md overflow-hidden w-full max-w-lg">
+            <Image
+              alt="Preview Image"
+              src={previewUrl}
+              width={800}
+              height={300}
+              className="object-cover w-full h-auto rounded-md"
+            />
+          </div>
         </div>
+      )}
 
-        <button
-          disabled={isBannerLoading || isFileUploadLoading}
-          type="submit"
-          className="w-full bg-orange-500 text-white font-semibold p-3 rounded-lg hover:bg-orange-500 transition duration-300 disabled:bg-orange-700"
+      {/* File Input */}
+      <div>
+        <label className="block text-gray-700 font-medium mb-1">
+          Upload Image <span className="text-red-500">*</span>
+        </label>
+
+        {/* Hidden native input */}
+        <input
+          type="file"
+          id="fileUpload"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+          required={!recordId}
+        />
+
+        {/* Custom label as button */}
+        <label
+          htmlFor="fileUpload"
+          className="inline-block cursor-pointer px-4 py-2 border border-orange-300 rounded-lg bg-orange-50 text-orange-700 hover:bg-orange-100 text-sm font-semibold"
         >
-          {isBannerLoading || isFileUploadLoading ? 'Loading...' : 'Submit'}
-        </button>
-      </form>
-    </>
+          {selectedFile?.name ||
+            bannerData?.data?.file_info?.file_name ||
+            'Choose an image'}
+        </label>
+      </div>
+
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={
+          isBannerLoading || isUpdateBannerLoading || isFileUploadLoading
+        }
+        className="w-full bg-orange-500 text-white font-semibold p-3 rounded-lg hover:bg-orange-600 transition duration-300 disabled:bg-orange-300"
+      >
+        {isBannerLoading || isFileUploadLoading ? 'Uploading...' : 'Submit'}
+      </button>
+    </form>
   );
 };
 

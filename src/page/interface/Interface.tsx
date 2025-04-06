@@ -36,7 +36,7 @@ const Interface = () => {
   const router = useRouter();
   const cardData = [
     { id: 1, title: 'Banner', icon: Image, link: 'interface/banner' },
-    { id: 2, title: 'Category', icon: Grid, link: 'interface/banner' }
+    { id: 2, title: 'Category', icon: Grid, link: 'interface/category' }
   ];
 
   return (
