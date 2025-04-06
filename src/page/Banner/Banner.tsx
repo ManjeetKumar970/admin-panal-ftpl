@@ -62,7 +62,7 @@ const Banner = () => {
   }, [error]);
 
   return (
-    <section className="text-gray-700 body-font py-10">
+    <section className="text-gray-700 body-font py-10 w-[1200px]">
       <div className="container mx-auto">
         <div className="flex flex-wrap justify-between items-center pb-8 border-b border-gray-300">
           <h1 className="text-3xl font-semibold text-gray-900">
